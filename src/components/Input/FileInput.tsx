@@ -24,16 +24,19 @@ import {
 } from 'react';
 import {
   FieldError,
+  FieldErrorsImpl,
   FieldValues,
+  Merge,
   UseFormSetError,
   UseFormTrigger,
 } from 'react-hook-form';
 import { FiAlertCircle, FiPlus } from 'react-icons/fi';
 import { api } from '../../services/api';
+import { CreateFormData } from '../Form/FormAddImage';
 
 export interface FileInputProps {
   name: string;
-  error?: FieldError;
+  error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
   setImageUrl: Dispatch<SetStateAction<string>>;
   localImageUrl: string;
   setLocalImageUrl: Dispatch<SetStateAction<string>>;
@@ -41,7 +44,7 @@ export interface FileInputProps {
   onChange: (
     event: React.ChangeEvent<HTMLInputElement>
   ) => Promise<boolean | void>;
-  trigger: UseFormTrigger<FieldValues>;
+  trigger: UseFormTrigger<CreateFormData>;
 }
 
 const FileInputBase: ForwardRefRenderFunction<
@@ -73,6 +76,8 @@ const FileInputBase: ForwardRefRenderFunction<
       if (!event.target.files?.length) {
         return;
       }
+
+      // console.log(event);
 
       setImageUrl('');
       setLocalImageUrl('');

@@ -8,7 +8,28 @@ import { api } from '../services/api';
 import { Loading } from '../components/Loading';
 import { Error } from '../components/Error';
 
+interface ResponseProps {
+  after: string;
+  data: {
+    description: string;
+    id: string;
+    title: string;
+    ts: number;
+    url: string;
+  }[];
+}
+
 export default function Home(): JSX.Element {
+  const fetchProjects = async ({
+    pageParam = undefined,
+  }): Promise<ResponseProps> => {
+    const response = await api.get(
+      `/api/images${pageParam ? `?after=${pageParam}` : ''}`
+    );
+
+    return response.data;
+  };
+
   const {
     data,
     isLoading,
@@ -16,20 +37,29 @@ export default function Home(): JSX.Element {
     isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
-  } = useInfiniteQuery(
-    'images',
-    // TODO AXIOS REQUEST WITH PARAM
-    ,
-    // TODO GET AND RETURN NEXT PAGE PARAM
-  );
+  } = useInfiniteQuery({
+    queryKey: 'images',
+
+    queryFn: fetchProjects,
+    getNextPageParam: lastPage => lastPage.after,
+  });
 
   const formattedData = useMemo(() => {
-    // TODO FORMAT AND FLAT DATA ARRAY
+    let response = [];
+    if (data) {
+      response = data.pages.map(pg => pg.data);
+    }
+
+    return response.flat();
   }, [data]);
 
-  // TODO RENDER LOADING SCREEN
+  if (isLoading) {
+    return <Loading key="loadingCards" />;
+  }
 
-  // TODO RENDER ERROR SCREEN
+  if (isError) {
+    return <Error key="errorCards" />;
+  }
 
   return (
     <>
@@ -37,7 +67,15 @@ export default function Home(): JSX.Element {
 
       <Box maxW={1120} px={20} mx="auto" my={20}>
         <CardList cards={formattedData} />
-        {/* TODO RENDER LOAD MORE BUTTON IF DATA HAS NEXT PAGE */}
+
+        <br />
+        <Button
+          onClick={() => fetchNextPage()}
+          disabled={!hasNextPage || isFetchingNextPage}
+          name={isFetchingNextPage ? 'Carregando...' : 'Carregar mais'}
+        >
+          {isFetchingNextPage ? 'Carregando...' : 'Carregar mais'}
+        </Button>
       </Box>
     </>
   );

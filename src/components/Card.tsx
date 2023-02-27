@@ -22,7 +22,7 @@ interface CardProps {
 
 export function Card({ data, viewImage }: CardProps): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
-
+  // console.log(data);
   return (
     <Box key={data.ts} borderRadius="md" bgColor="pGray.800">
       <Skeleton isLoaded={!isLoading}>
@@ -30,7 +30,7 @@ export function Card({ data, viewImage }: CardProps): JSX.Element {
           src={data.url}
           alt={data.title}
           objectFit="cover"
-          w="max"
+          w="100%"
           h={48}
           borderTopRadius="md"
           onClick={() => viewImage(data.url)}
