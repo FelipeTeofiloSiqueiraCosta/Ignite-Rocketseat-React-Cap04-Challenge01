@@ -23,9 +23,11 @@ export default function Home(): JSX.Element {
   const fetchProjects = async ({
     pageParam = undefined,
   }): Promise<ResponseProps> => {
-    const response = await api.get(
-      `/api/images${pageParam ? `?after=${pageParam}` : ''}`
-    );
+    const response = await api.get(`/api/images`, {
+      params: {
+        after: pageParam,
+      },
+    });
 
     return response.data;
   };
@@ -69,13 +71,15 @@ export default function Home(): JSX.Element {
         <CardList cards={formattedData} />
 
         <br />
-        <Button
-          onClick={() => fetchNextPage()}
-          disabled={!hasNextPage || isFetchingNextPage}
-          name={isFetchingNextPage ? 'Carregando...' : 'Carregar mais'}
-        >
-          {isFetchingNextPage ? 'Carregando...' : 'Carregar mais'}
-        </Button>
+        {hasNextPage && (
+          <Button
+            onClick={() => fetchNextPage()}
+            disabled={!hasNextPage || isFetchingNextPage}
+            name={isFetchingNextPage ? 'Carregando...' : 'Carregar mais'}
+          >
+            {isFetchingNextPage ? 'Carregando...' : 'Carregar mais'}
+          </Button>
+        )}
       </Box>
     </>
   );
